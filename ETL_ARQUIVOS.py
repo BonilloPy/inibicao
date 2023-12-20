@@ -9,7 +9,6 @@ from datetime import datetime
 from io import BytesIO
 
 
-
 def convert_csv_to_xlsx(folder_path):
     for file in os.listdir(folder_path):
         if file.endswith('.csv'):
@@ -17,7 +16,6 @@ def convert_csv_to_xlsx(folder_path):
             
             for encoding in ['utf-8', 'latin1', 'ISO-8859-1', 'cp1252']:
                 try:
-                    # Usando o argumento on_bad_lines='skip' para ignorar linhas com problemas
                     df = pd.read_csv(file_path, encoding=encoding, delimiter=';', on_bad_lines='skip')
                     xlsx_file = os.path.splitext(file_path)[0] + '.xlsx'
                     df.to_excel(xlsx_file, index=False)
@@ -25,19 +23,33 @@ def convert_csv_to_xlsx(folder_path):
                     break
                 except UnicodeDecodeError:
                     continue
+                except pd.errors.ParserError:
+                    st.error(f"Erro ao analisar {file}.")
+                    break
+                except PermissionError:
+                    st.error(f"Erro de permissão ao acessar {file}.")
+                    break
+                except FileNotFoundError:
+                    st.error(f"Arquivo {file} não encontrado.")
+                    break
+                except Exception as e:
+                    st.error(f"Erro ao processar {file}: {e}")
+                    break
 
             else:
                 st.error(f"Não foi possível converter {file}. Encoding não suportado.")
 
-
-
-            # Botão para converter arquivos CSV para XLSX
+# Botão para converter arquivos CSV para XLSX
 if st.button("Converter arquivos CSV para XLSX"):
     folder_path = st.text_input("Digite o caminho da pasta contendo arquivos CSV")
     if folder_path:
         convert_csv_to_xlsx(folder_path)
+        st.write(f"Verificando o diretório: {folder_path}")
     else:
         st.error("Por favor, insira um caminho de pasta válido.")
+
+
+
 
 # Define as funções necessárias para processamento de dados
 def remove_espacos_colunas(dataframe):
