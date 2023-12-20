@@ -8,27 +8,36 @@ import streamlit as st
 from datetime import datetime
 from io import BytesIO
 
-
 from pathlib import Path
+import pandas as pd
+import streamlit as st
 
 def convert_csv_to_xlsx(folder_path):
-    path = Path(folder_path)
-    for file in path.glob('*.csv'):
-        try:
-            df = pd.read_csv(file, delimiter=';', on_bad_lines='skip')
-            xlsx_file = file.with_suffix('.xlsx')
-            df.to_excel(xlsx_file, index=False)
-            st.success(f"{file.name} convertido para o formato XLSX.")
-        except UnicodeDecodeError:
-            st.error(f"Erro de decodificação ao analisar {file.name}.")
-        except pd.errors.ParserError:
-            st.error(f"Erro ao analisar {file.name}.")
-        except PermissionError:
-            st.error(f"Erro de permissão ao acessar {file.name}.")
-        except FileNotFoundError:
-            st.error(f"Arquivo {file.name} não encontrado.")
-        except Exception as e:
-            st.error(f"Erro ao processar {file.name}: {e}")
+    folder = Path(folder_path)
+    for file in folder.glob('*.csv'):
+        for encoding in ['utf-8', 'latin1', 'ISO-8859-1', 'cp1252']:
+            try:
+                df = pd.read_csv(file, encoding=encoding, delimiter=';', on_bad_lines='skip')
+                xlsx_file = file.with_suffix('.xlsx')
+                df.to_excel(xlsx_file, index=False)
+                st.success(f"{file.name} convertido para o formato XLSX usando {encoding} encoding.")
+                break
+            except UnicodeDecodeError:
+                continue
+            except pd.errors.ParserError:
+                st.error(f"Erro ao analisar {file.name}.")
+                break
+            except PermissionError:
+                st.error(f"Erro de permissão ao acessar {file.name}.")
+                break
+            except FileNotFoundError:
+                st.error(f"Arquivo {file.name} não encontrado.")
+                break
+            except Exception as e:
+                st.error(f"Erro ao processar {file.name}: {e}")
+                break
+        else:
+            st.error(f"Não foi possível converter {file.name}. Encoding não suportado.")
 
 # Botão para converter arquivos CSV para XLSX
 if st.button("Converter arquivos CSV para XLSX"):
@@ -38,27 +47,6 @@ if st.button("Converter arquivos CSV para XLSX"):
         st.write(f"Verificando o diretório: {folder_path}")
     else:
         st.error("Por favor, insira um caminho de pasta válido.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
 
 
 
