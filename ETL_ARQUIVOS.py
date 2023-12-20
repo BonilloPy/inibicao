@@ -2,10 +2,42 @@
 
 import re
 import time
+import os
 import pandas as pd
 import streamlit as st
 from datetime import datetime
 from io import BytesIO
+
+
+
+def convert_csv_to_xlsx(folder_path):
+    for file in os.listdir(folder_path):
+        if file.endswith('.csv'):
+            file_path = os.path.join(folder_path, file)
+            
+            for encoding in ['utf-8', 'latin1', 'ISO-8859-1', 'cp1252']:
+                try:
+                    # Usando o argumento on_bad_lines='skip' para ignorar linhas com problemas
+                    df = pd.read_csv(file_path, encoding=encoding, delimiter=';', on_bad_lines='skip')
+                    xlsx_file = os.path.splitext(file_path)[0] + '.xlsx'
+                    df.to_excel(xlsx_file, index=False)
+                    st.success(f"{file} convertido para o formato XLSX usando {encoding} encoding.")
+                    break
+                except UnicodeDecodeError:
+                    continue
+
+            else:
+                st.error(f"Não foi possível converter {file}. Encoding não suportado.")
+
+
+
+            # Botão para converter arquivos CSV para XLSX
+if st.button("Converter arquivos CSV para XLSX"):
+    folder_path = st.text_input("Digite o caminho da pasta contendo arquivos CSV")
+    if folder_path:
+        convert_csv_to_xlsx(folder_path)
+    else:
+        st.error("Por favor, insira um caminho de pasta válido.")
 
 # Define as funções necessárias para processamento de dados
 def remove_espacos_colunas(dataframe):
