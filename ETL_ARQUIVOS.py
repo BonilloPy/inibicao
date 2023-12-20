@@ -17,7 +17,7 @@ def convert_csv_to_xlsx(folder_path):
     for file in folder.glob('*.csv'):
         for encoding in ['utf-8', 'latin1', 'ISO-8859-1', 'cp1252']:
             try:
-                df = pd.read_csv(file, encoding=encoding, delimiter=';', on_bad_lines='skip')
+                df = pd.read_csv(file, encoding=encoding, delimiter=',', on_bad_lines='skip')
                 xlsx_file = file.with_suffix('.xlsx')
                 df.to_excel(xlsx_file, index=False)
                 st.success(f"{file.name} convertido para o formato XLSX usando {encoding} encoding.")
