@@ -58,9 +58,14 @@ def remove_espacos_colunas(dataframe):
 
 def remove_espacos_celulas(dataframe):
     for col in dataframe.columns:
-        if dataframe[col].dtype == 'object':
-            dataframe[col] = dataframe[col].str.strip()
+        if dataframe[col].dtype == 'object':  # Verifica se a coluna é do tipo 'object'
+            try:
+                dataframe[col] = dataframe[col].str.strip()  # Aplica strip se for string
+            except AttributeError:
+                # Se não for string, ignora a operação
+                pass
     return dataframe
+
 
 def remove_numeros(texto):
     return re.sub(r'\d+', '', texto) if isinstance(texto, str) else texto
