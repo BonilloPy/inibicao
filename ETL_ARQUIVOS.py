@@ -8,45 +8,45 @@ import streamlit as st
 from datetime import datetime
 from io import BytesIO
 
-from pathlib import Path
-import pandas as pd
-import streamlit as st
 
 def convert_csv_to_xlsx(folder_path):
-    folder = Path(folder_path)
-    for file in folder.glob('*.csv'):
-        for encoding in ['utf-8', 'latin1', 'ISO-8859-1', 'cp1252']:
-            try:
-                df = pd.read_csv(file, encoding=encoding, delimiter=',', on_bad_lines='skip')
-                xlsx_file = file.with_suffix('.xlsx')
-                df.to_excel(xlsx_file, index=False)
-                st.success(f"{file.name} convertido para o formato XLSX usando {encoding} encoding.")
-                break
-            except UnicodeDecodeError:
-                continue
-            except pd.errors.ParserError:
-                st.error(f"Erro ao analisar {file.name}.")
-                break
-            except PermissionError:
-                st.error(f"Erro de permissão ao acessar {file.name}.")
-                break
-            except FileNotFoundError:
-                st.error(f"Arquivo {file.name} não encontrado.")
-                break
-            except Exception as e:
-                st.error(f"Erro ao processar {file.name}: {e}")
-                break
-        else:
-            st.error(f"Não foi possível converter {file.name}. Encoding não suportado.")
+    for file in os.listdir(folder_path):
+        if file.endswith('.csv'):
+            file_path = os.path.join(folder_path, file)
+            
+            for encoding in ['utf-8', 'latin1', 'ISO-8859-1', 'cp1252']:
+                try:
+                    df = pd.read_csv(file_path, encoding=encoding, delimiter=';', on_bad_lines='skip')
+                    xlsx_file = os.path.splitext(file_path)[0] + '.xlsx'
+                    df.to_excel(xlsx_file, index=False)
+                    st.success(f"{file} convertido para o formato XLSX usando {encoding} encoding.")
+                    break
+                except UnicodeDecodeError:
+                    continue
+                except pd.errors.ParserError:
+                    st.error(f"Erro ao analisar {file}.")
+                    break
+                except PermissionError:
+                    st.error(f"Erro de permissão ao acessar {file}.")
+                    break
+                except FileNotFoundError:
+                    st.error(f"Arquivo {file} não encontrado.")
+                    break
+                except Exception as e:
+                    st.error(f"Erro ao processar {file}: {e}")
+                    break
 
-### Botão para converter arquivos CSV para XLSX
-##if st.button("Converter arquivos CSV para XLSX"):
-##    folder_path = st.text_input("Digite o caminho da pasta contendo arquivos CSV")
-##    if folder_path:
-##        convert_csv_to_xlsx(folder_path)
-##        st.write(f"Verificando o diretório: {folder_path}")
-##    else:
-##        st.error("Por favor, insira um caminho de pasta válido.")
+            else:
+                st.error(f"Não foi possível converter {file}. Encoding não suportado.")
+
+# Botão para converter arquivos CSV para XLSX
+if st.button("Converter arquivos CSV para XLSX"):
+    folder_path = st.text_input("Digite o caminho da pasta contendo arquivos CSV")
+    if folder_path:
+        convert_csv_to_xlsx(folder_path)
+        st.write(f"Verificando o diretório: {folder_path}")
+    else:
+        st.error("Por favor, insira um caminho de pasta válido.")
 
 
 
@@ -58,14 +58,9 @@ def remove_espacos_colunas(dataframe):
 
 def remove_espacos_celulas(dataframe):
     for col in dataframe.columns:
-        if dataframe[col].dtype == 'object':  # Verifica se a coluna é do tipo 'object'
-            try:
-                dataframe[col] = dataframe[col].str.strip()  # Aplica strip se for string
-            except AttributeError:
-                # Se não for string, ignora a operação
-                pass
+        if dataframe[col].dtype == 'object':
+            dataframe[col] = dataframe[col].str.strip()
     return dataframe
-
 
 def remove_numeros(texto):
     return re.sub(r'\d+', '', texto) if isinstance(texto, str) else texto
