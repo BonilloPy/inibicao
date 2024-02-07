@@ -38,15 +38,15 @@ def convert_csv_to_xlsx(folder_path):
 
             else:
                 st.error(f"Não foi possível converter {file}. Encoding não suportado.")
-
-# Botão para converter arquivos CSV para XLSX
-if st.button("Converter arquivos CSV para XLSX"):
-    folder_path = st.text_input("Digite o caminho da pasta contendo arquivos CSV")
-    if folder_path:
-        convert_csv_to_xlsx(folder_path)
-        st.write(f"Verificando o diretório: {folder_path}")
-    else:
-        st.error("Por favor, insira um caminho de pasta válido.")
+##
+### Botão para converter arquivos CSV para XLSX
+##if st.button("Converter arquivos CSV para XLSX"):
+##    folder_path = st.text_input("Digite o caminho da pasta contendo arquivos CSV")
+##    if folder_path:
+##        convert_csv_to_xlsx(folder_path)
+##        st.write(f"Verificando o diretório: {folder_path}")
+##    else:
+##        st.error("Por favor, insira um caminho de pasta válido.")
 
 
 
